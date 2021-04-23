@@ -29,11 +29,22 @@ public final class CoreDataFeedStore: FeedStore {
 	}
 
 	public func retrieve(completion: @escaping RetrievalCompletion) {
-		completion(.empty)
+		context.perform { [self] in
+			let cacheFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "ManagedCache")
+			if let fetchedFeed = (try? context.fetch(cacheFetch))?.first as? ManagedCache {
+				completion(.found(feed: fetchedFeed.feed()!, timestamp: fetchedFeed.timestamp!))
+			} else {
+				completion(.empty)
+			}
+		}
 	}
 
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-		fatalError("Must be implemented")
+		context.perform { [self] in
+			ManagedCache.create(with: feed, timestamp: timestamp, in: context)
+			try? context.save()
+			completion(nil)
+		}
 	}
 
 	public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
