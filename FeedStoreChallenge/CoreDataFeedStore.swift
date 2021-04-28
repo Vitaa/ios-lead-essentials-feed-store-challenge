@@ -31,10 +31,14 @@ public final class CoreDataFeedStore: FeedStore {
 	public func retrieve(completion: @escaping RetrievalCompletion) {
 		context.perform { [self] in
 			let cacheFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "ManagedCache")
-			if let fetchedFeed = (try? context.fetch(cacheFetch))?.first as? ManagedCache {
-				completion(.found(feed: fetchedFeed.feed()!, timestamp: fetchedFeed.timestamp!))
-			} else {
-				completion(.empty)
+			do {
+				if let fetchedFeed = (try context.fetch(cacheFetch)).first as? ManagedCache {
+					completion(.found(feed: fetchedFeed.feed()!, timestamp: fetchedFeed.timestamp!))
+				} else {
+					completion(.empty)
+				}
+			} catch {
+				completion(.failure(error))
 			}
 		}
 	}
