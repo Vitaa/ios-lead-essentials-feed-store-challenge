@@ -49,10 +49,15 @@ public final class CoreDataFeedStore: FeedStore {
 			if let error = error {
 				completion(error)
 			} else {
-				self.context.perform { [self] in
+				self.context.perform { [weak self] in
+					guard let self = self else { return }
 					ManagedCache.create(with: feed, timestamp: timestamp, in: self.context)
-					try? self.context.save()
-					completion(nil)
+					do {
+						try self.context.save()
+						completion(nil)
+					} catch {
+						completion(error)
+					}
 				}
 			}
 		}
