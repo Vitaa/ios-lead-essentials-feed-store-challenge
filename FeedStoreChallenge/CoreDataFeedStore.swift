@@ -29,11 +29,12 @@ public final class CoreDataFeedStore: FeedStore {
 	}
 
 	public func retrieve(completion: @escaping RetrievalCompletion) {
-		context.perform { [self] in
-			let cacheFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "ManagedCache")
+		let context = self.context
+		context.performAndWait {
 			do {
-				if let fetchedFeed = (try context.fetch(cacheFetch)).first as? ManagedCache {
-					completion(.found(feed: fetchedFeed.feed()!, timestamp: fetchedFeed.timestamp!))
+				if let fetchedFeed = try ManagedCache.find(in: context)?.first,
+				   let feed = fetchedFeed.feed(), let timestamp = fetchedFeed.timestamp {
+					completion(.found(feed: feed, timestamp: timestamp))
 				} else {
 					completion(.empty)
 				}
@@ -44,34 +45,30 @@ public final class CoreDataFeedStore: FeedStore {
 	}
 
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-		deleteCachedFeed { [weak self] error in
-			guard let self = self else { return }
-			if let error = error {
+		let context = self.context
+
+		context.performAndWait {
+			do {
+				try ManagedCache.delete(in: context)
+				ManagedCache.create(with: feed, timestamp: timestamp, in: self.context)
+				try context.save()
+				completion(nil)
+			} catch {
+				context.rollback()
 				completion(error)
-			} else {
-				self.context.perform { [weak self] in
-					guard let self = self else { return }
-					ManagedCache.create(with: feed, timestamp: timestamp, in: self.context)
-					do {
-						try self.context.save()
-						completion(nil)
-					} catch {
-						completion(error)
-					}
-				}
 			}
 		}
 	}
 
 	public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-		let cacheFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "ManagedCache")
-		context.perform { [weak self] in
-			guard let self = self else { return }
+		let context = self.context
+		context.performAndWait {
 			do {
-				let fetchedFeed = try self.context.fetch(cacheFetch) as? [ManagedCache]
-				fetchedFeed?.forEach { self.context.delete($0) }
+				try ManagedCache.delete(in: context)
+				try context.save()
 				completion(nil)
 			} catch {
+				context.rollback()
 				completion(error)
 			}
 		}

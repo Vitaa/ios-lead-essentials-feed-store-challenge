@@ -58,6 +58,15 @@ extension ManagedCache {
 		return cache
 	}
 
+	static func find(in context: NSManagedObjectContext) throws -> [ManagedCache]? {
+		let cacheFetch: NSFetchRequest = ManagedCache.fetchRequest()
+		return try context.fetch(cacheFetch)
+	}
+
+	static func delete(in context: NSManagedObjectContext) throws {
+		try ManagedCache.find(in: context)?.forEach { context.delete($0) }
+	}
+
 	func feed() -> [LocalFeedImage]? {
 		(images?.array as? [ManagedFeedImage])?.map { $0.toLocalFeedImage() }
 	}
