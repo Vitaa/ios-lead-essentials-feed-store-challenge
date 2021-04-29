@@ -121,7 +121,7 @@ class FeedStoreChallengeTests: XCTestCase, FailableFeedStoreSpecs {
 	}
 
 	func test_delete_deliversErrorOnDeletionError() throws {
-    let stub = NSManagedObjectContext.alwaysFailingSaveStub()
+		let stub = NSManagedObjectContext.alwaysFailingSaveStub()
 		let feed = uniqueImageFeed()
 		let timestamp = Date()
 		let sut = try makeSUT()
