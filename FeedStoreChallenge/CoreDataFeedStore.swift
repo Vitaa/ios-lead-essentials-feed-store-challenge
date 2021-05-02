@@ -48,7 +48,7 @@ public final class CoreDataFeedStore: FeedStore {
 		context.perform {
 			do {
 				try ManagedCache.delete(in: context)
-				ManagedCache.create(with: feed, timestamp: timestamp, in: self.context)
+				ManagedCache.create(with: feed, timestamp: timestamp, in: context)
 				try context.save()
 				completion(nil)
 			} catch {
