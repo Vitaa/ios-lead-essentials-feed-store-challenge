@@ -38,7 +38,7 @@ extension ManagedFeedImage {
 	}
 
 	func toLocalFeedImage() -> LocalFeedImage {
-		return LocalFeedImage(id: id!, description: desc, location: location, url: url!)
+		return LocalFeedImage(id: id, description: desc, location: location, url: url)
 	}
 }
 
@@ -61,7 +61,7 @@ extension ManagedCache {
 		try ManagedCache.find(in: context)?.forEach { context.delete($0) }
 	}
 
-	func feed() -> [LocalFeedImage]? {
-		(images?.array as? [ManagedFeedImage])?.map { $0.toLocalFeedImage() }
+	func feed() -> [LocalFeedImage] {
+		images.compactMap { ($0 as? ManagedFeedImage)?.toLocalFeedImage() }
 	}
 }
