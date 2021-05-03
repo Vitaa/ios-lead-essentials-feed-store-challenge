@@ -23,13 +23,11 @@ extension ManagedCache {
 }
 
 extension ManagedCache {
-	@discardableResult
-	static func create(with feed: [LocalFeedImage], timestamp: Date, in context: NSManagedObjectContext) -> ManagedCache {
+	static func create(with feed: [LocalFeedImage], timestamp: Date, in context: NSManagedObjectContext) {
 		let cache = ManagedCache(context: context)
 		let images = feed.map { ManagedFeedImage.create(with: $0, in: context) }
 		cache.images = NSOrderedSet(array: images)
 		cache.timestamp = timestamp
-		return cache
 	}
 
 	static func find(in context: NSManagedObjectContext) throws -> [ManagedCache]? {
