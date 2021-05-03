@@ -27,21 +27,6 @@ extension NSManagedObjectModel {
 	}
 }
 
-extension ManagedFeedImage {
-	static func create(with feedImage: LocalFeedImage, in context: NSManagedObjectContext) -> ManagedFeedImage {
-		let image = ManagedFeedImage(context: context)
-		image.id = feedImage.id
-		image.location = feedImage.location
-		image.url = feedImage.url
-		image.desc = feedImage.description
-		return image
-	}
-
-	func toLocalFeedImage() -> LocalFeedImage {
-		return LocalFeedImage(id: id, description: desc, location: location, url: url)
-	}
-}
-
 extension ManagedCache {
 	@discardableResult
 	static func create(with feed: [LocalFeedImage], timestamp: Date, in context: NSManagedObjectContext) -> ManagedCache {
