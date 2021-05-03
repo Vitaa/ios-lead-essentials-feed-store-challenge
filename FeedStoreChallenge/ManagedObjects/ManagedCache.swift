@@ -30,13 +30,13 @@ extension ManagedCache {
 		cache.timestamp = timestamp
 	}
 
-	static func find(in context: NSManagedObjectContext) throws -> [ManagedCache]? {
+	static func find(in context: NSManagedObjectContext) throws -> [ManagedCache] {
 		let cacheFetch: NSFetchRequest = ManagedCache.fetchRequest()
 		return try context.fetch(cacheFetch)
 	}
 
 	static func delete(in context: NSManagedObjectContext) throws {
-		try ManagedCache.find(in: context)?.forEach { context.delete($0) }
+		try ManagedCache.find(in: context).forEach { context.delete($0) }
 	}
 
 	func feed() -> [LocalFeedImage] {
