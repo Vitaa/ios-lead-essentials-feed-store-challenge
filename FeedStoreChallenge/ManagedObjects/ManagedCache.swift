@@ -11,15 +11,15 @@ import Foundation
 import CoreData
 
 @objc(ManagedCache)
-public class ManagedCache: NSManagedObject {}
+final class ManagedCache: NSManagedObject {}
 
 extension ManagedCache {
-	@nonobjc public class func fetchRequest() -> NSFetchRequest<ManagedCache> {
+	@nonobjc class func fetchRequest() -> NSFetchRequest<ManagedCache> {
 		return NSFetchRequest<ManagedCache>(entityName: "ManagedCache")
 	}
 
-	@NSManaged public var timestamp: Date
-	@NSManaged public var images: NSOrderedSet
+	@NSManaged var timestamp: Date
+	@NSManaged var images: NSOrderedSet
 }
 
 extension ManagedCache {
